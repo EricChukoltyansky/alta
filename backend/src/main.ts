@@ -14,6 +14,11 @@ async function bootstrap() {
     .setDescription('API for locations management')
     .setVersion('1.0')
     .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
+
   await app.listen(process.env.PORT ?? 3000);
+  console.log('🚀 Server running on http://localhost:3000');
 }
 bootstrap();
