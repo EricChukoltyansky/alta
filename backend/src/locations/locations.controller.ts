@@ -13,10 +13,12 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { LocationService } from './locations.service';
-import {
+import type {
   CreateLocationDto,
   UpdateLocationDto,
   QueryLocationsDto,
+} from './dto/create-locations.dto';
+import {
   CreateLocationSchema,
   UpdateLocationSchema,
   QueryLocationSchema,
@@ -47,5 +49,22 @@ export class LocationsController {
   @ApiOperation({ summary: 'Get a location by ID' })
   findOne(@Param('id') id: string) {
     return this.locationsService.findOne(id);
+  }
+
+  @Patch(':id')
+  @UsePipes(new ZodValidationPipe(UpdateLocationSchema))
+  @ApiOperation({ summary: 'Update a location' })
+  update(
+    @Param('id') id: string,
+    @Body() updateLocationDto: UpdateLocationDto,
+  ) {
+    return this.locationsService.update(id, updateLocationDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a location' })
+  remove(@Param('id') id: string) {
+    return this.locationsService.remove(id);
   }
 }
