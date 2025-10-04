@@ -18,7 +18,7 @@ export class Location {
   })
   coordinates: {
     lon: number;
-    lat: number;
+    lat: number;``
   };
 
   @Prop({ maxLength: 120 })
