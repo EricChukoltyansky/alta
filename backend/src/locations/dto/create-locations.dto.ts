@@ -12,7 +12,10 @@ export const CreateLocationSchema = z.object({
 });
 
 export type CreateLocationDto = z.infer<typeof CreateLocationSchema>;
+export type UpdateLocationDto = z.infer<typeof CreateLocationSchema>;
 
+export const UpdateLocationSchema = CreateLocationSchema.partial();
 
-
-
+export const QueryLocationSchema = z.object({
+    
+})
