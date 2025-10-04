@@ -1,8 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+
+export type LocationDocument = Location & Document;
 
 @Schema({ timestamps: true })
 export class Location {
-  @Prop({ required: true, minLength: 2, maxLength: 60 })
+  @Prop({ required: true, minlength: 2, maxlength: 60 })
   name: string;
 
   @Prop({ required: true, enum: ['office', 'store', 'landmark'] })
@@ -18,13 +21,13 @@ export class Location {
   })
   coordinates: {
     lon: number;
-    lat: number;``
+    lat: number;
   };
 
-  @Prop({ maxLength: 120 })
+  @Prop({ maxlength: 120 })
   address?: string;
 
-  @Prop({ maxLength: 500 })
+  @Prop({ maxlength: 500 })
   notes?: string;
 }
 
