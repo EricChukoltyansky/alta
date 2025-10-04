@@ -34,17 +34,13 @@ export class LocationService {
   }
 
   async findAll(query: QueryLocationsDto) {
-    const { page = 1, limit = 10, search, category, tags } = query;
+    const { page = 1, limit = 10, search, category } = query;
     const skip = (page - 1) * limit;
 
     const filter: any = {};
 
     if (category) {
       filter.category = category;
-    }
-
-    if (tags && tags.length > 0) {
-      filter.tags = { $in: tags };
     }
 
     if (search) {
@@ -70,5 +66,33 @@ export class LocationService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  async findOne(id: string) {
+    const location = await this.locationModel.findById(id).exec();
+    if (!location) {
+      throw new NotFoundException(`Location with ID ${id} not found`);
+    }
+    return location;
+  }
+
+  async update(id: string, updateDto: UpdateLocationDto) {
+    const location = await this.locationModel
+      .findByIdAndUpdate(id, updateDto, { new: true, runValidators: true })
+      .exec();
+
+    if (!location) {
+      throw new NotFoundException(`Location with ID ${id} not found`);
+    }
+
+    return location;
+  }
+
+  async remove(id: string) {
+    const result = await this.locationModel.findByIdAndDelete(id).exec();
+    if (!result) {
+      throw new NotFoundException(`Location with ID ${id} not found`);
+    }
+    return result;
   }
 }
