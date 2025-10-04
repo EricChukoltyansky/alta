@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
-export class GeocodingService {
+export class GeocodingService<T> {
   private readonly logger = new Logger(GeocodingService.name);
-  private readonly cache = new Map();
+  private readonly cache = new Map<string, { value: T; timestamp: number }>();
   private readonly CACHE_TTL = 10 * 60 * 1000;
   private readonly BASE_URL = 'https://nominatim.openstreetmap.org';
   private getFromCache(key: string): T | null {
@@ -14,12 +14,47 @@ export class GeocodingService {
       this.cache.delete(key);
       return null;
     }
+
+    return entry.value;
+  }
+  private setCache(key: string, data: T): void {
+    this.cache.set(key, { value: data, timestamp: Date.now() });
   }
 
-  async coordinatesToAddress(lon: number, lat: number): Promise<T> {
+  async coordinatesToAddress(
+    lon: number,
+    lat: number,
+  ): Promise<T | undefined | null> {
     const cacheKey = `coords:${lon}, ${lat}`;
     const cached = this.getFromCache(cacheKey);
 
     if (cached) return cached;
+
+    try {
+      const response = await fetch(
+        `${this.BASE_URL}/reverse?format=json&lon=${lon}&lat=${lat}`,
+        {
+          headers: { 'User-Agent': 'LocationManager/1.0' },
+          signal: AbortSignal.timeout(5000),
+        },
+      );
+
+      if (!response.ok) {
+        this.logger.warn(`Reverse geocoding failed: ${response.status}`);
+        return null;
+      }
+
+      const data = await response.json();
+      const address = data.display_name || null;
+
+      if (address) {
+        this.setCache(cacheKey, address);
+      }
+
+      return address;
+    } catch (error) {
+      this.logger.error('Reverse geocoding error', error);
+      return null;
+    }
   }
 }
