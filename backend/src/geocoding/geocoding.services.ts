@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-interface CacheEntry {
-    data: T;
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
 }
 
 @Injectable()
